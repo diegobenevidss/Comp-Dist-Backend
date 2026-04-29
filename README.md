@@ -1,59 +1,154 @@
 # HealthSys Distribuido Backend
 
-Monorepo backend da entrega das semanas 1-2 e 3-4 do projeto HealthSys SaaS.
+Monorepo backend do projeto HealthSys SaaS com Spring Boot, API Gateway, PostgreSQL, RabbitMQ, Redis e microsservicos.
 
 ## Estrutura
 
-- `services/api-gateway`: roteamento de entrada para os servicos internos
-- `services/identity-service`: autenticacao JWT e gestao de usuarios
-- `services/patient-service`: cadastro e atualizacao de pacientes
-- `services/notification-service`: consumo basico de eventos RabbitMQ
-- `infra/docker-compose.yml`: ambiente local com PostgreSQL, RabbitMQ e servicos
-- `docs/`: documentacao tecnica e mapeamento das sprints
+- `services/api-gateway`: entrada HTTP unica e roteamento para os servicos internos
+- `services/identity-service`: autenticacao JWT, logout com revogacao e gestao de usuarios
+- `services/patient-service`: cadastro, consulta, atualizacao e inativacao logica de pacientes
+- `services/triage-service`: abertura, consulta e atualizacao de status de triagens
+- `services/notification-service`: consumo de eventos RabbitMQ, persistencia e leitura de notificacoes
+- `infra/docker-compose.yml`: ambiente local completo com PostgreSQL, RabbitMQ, Redis, backend e frontend
+- `infra/postgres/init`: criacao idempotente dos bancos dos servicos
+- `docs/`: documentacao tecnica e auditorias
 
 ## Escopo Implementado
 
-- Semana 1-2
+- Semanas 1-2
   - estrutura do repositorio
-  - modelagem inicial do dominio
+  - modelagem inicial dos bancos
   - ambiente Docker Compose
-  - configuracao de PostgreSQL e RabbitMQ
-- Semana 3-4
+  - PostgreSQL e RabbitMQ em containers
+- Semanas 3-4
   - login com JWT
+  - logout com revogacao de token
   - cadastro e listagem de usuarios
-  - cadastro, consulta e atualizacao de pacientes
+  - cadastro, consulta, atualizacao e inativacao de pacientes
   - API Gateway com rotas centrais
+- Semanas 5-6
+  - `triage-service` para fluxo de triagem
+  - `notification-service` persistente para eventos assincronos
+  - Redis para cache/rate limiter
+  - eventos via RabbitMQ entre servicos
+  - frontend buildado e servido pelo Compose
 
-## Fora de Escopo Nesta Entrega
+## Execucao Completa
 
-- prontuario eletronico
-- triagem medica
-- analytics
-- operacao offline
-- QR code
-- Terraform
-- ELK Stack
-- funcionalidades opcionais do documento
-
-## Execucao
-
-1. Suba a infraestrutura:
+Na raiz do backend:
 
 ```powershell
-docker compose -f .\infra\docker-compose.yml up --build
+Set-Location C:\Users\felip\OneDrive\Desktop\Comp-Dist-Backend
+docker compose -f .\infra\docker-compose.yml up -d --build
 ```
 
-2. Credenciais padrao de desenvolvimento:
+Esse comando sobe:
+
+- PostgreSQL
+- `postgres-init`
+- RabbitMQ
+- Redis
+- `identity-service`
+- `patient-service`
+- `triage-service`
+- `notification-service`
+- `api-gateway`
+- frontend
+
+URLs:
+
+- Frontend: `http://localhost:4173`
+- API Gateway: `http://localhost:8080`
+- RabbitMQ UI: `http://localhost:15672`
+
+Credenciais padrao:
 
 - admin: `admin@healthsys.local`
 - senha: `Admin@123`
+- RabbitMQ: `healthsys` / `healthsys`
 
-3. Endpoints principais via gateway:
+## Ajuste do PostgreSQL
+
+O Compose inclui o servico `postgres-init`. Ele roda depois do PostgreSQL ficar saudavel e antes dos microsservicos, executando `infra/postgres/init/01-create-databases.sql`.
+
+Esse script e idempotente: cria apenas os bancos ausentes. Isso resolve tanto instalacao limpa quanto ambiente com volume antigo, onde o init padrao do container PostgreSQL nao roda novamente.
+
+Bancos criados/verificados:
+
+- `healthsys_identity`
+- `healthsys_patient`
+- `healthsys_triage`
+- `healthsys_notification`
+
+## Endpoints via Gateway
+
+Autenticacao:
 
 - `POST /api/auth/login`
 - `GET /api/auth/me`
-- `POST /api/users`
+- `POST /api/auth/logout`
+
+Usuarios:
+
 - `GET /api/users`
-- `POST /api/patients`
+- `POST /api/users`
+
+Pacientes:
+
 - `GET /api/patients`
+- `GET /api/patients/{id}`
+- `POST /api/patients`
 - `PUT /api/patients/{id}`
+
+Triagens:
+
+- `GET /api/triages`
+- `GET /api/triages/{id}`
+- `GET /api/triages/patient/{patientId}`
+- `POST /api/triages`
+- `PUT /api/triages/{id}/status`
+
+Notificacoes:
+
+- `GET /api/notifications`
+- `GET /api/notifications?unread=true`
+- `GET /api/notifications/{id}`
+- `PUT /api/notifications/{id}/read`
+
+## Testes e Validacao
+
+Backend:
+
+```powershell
+mvn test -q
+```
+
+Frontend:
+
+```powershell
+Set-Location C:\Users\felip\OneDrive\Desktop\Comp-Dist-Fronted
+npm.cmd run typecheck
+npm.cmd run build
+```
+
+Smoke real, com a stack de pe:
+
+```powershell
+Set-Location C:\Users\felip\OneDrive\Desktop\Comp-Dist-Backend
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-weeks-1-4.ps1
+```
+
+Observacao: apos `docker compose up -d --build`, aguarde os servicos Spring Boot terminarem a inicializacao antes de executar chamadas manuais. O container pode aparecer como `Up` antes de o endpoint estar pronto.
+
+## Fora de Escopo Nesta Entrega
+
+- prontuario eletronico completo
+- triagem completa alem do fluxo inicial implementado
+- operacao offline
+- analytics hospitalar
+- QR Code
+- monitoramento hospitalar completo
+- educacao em saude
+- Terraform
+- ELK Stack
+- funcionalidades opcionais do documento base
