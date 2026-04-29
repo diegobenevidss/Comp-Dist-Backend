@@ -32,6 +32,17 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: healthsys-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   identity-service:
     build:
       context: ..
@@ -70,6 +81,31 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: healthsys
       SPRING_RABBITMQ_PASSWORD: healthsys
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: change-this-shared-secret-for-dev-only
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  triage-service:
+    build:
+      context: ..
+      dockerfile: services/triage-service/Dockerfile
+    container_name: healthsys-triage-service
+    environment:
+      SERVER_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthsys_triage
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: healthsys
+      SPRING_RABBITMQ_PASSWORD: healthsys
       JWT_SECRET: change-this-shared-secret-for-dev-only
     depends_on:
       postgres:
@@ -84,11 +120,17 @@ services:
     container_name: healthsys-notification-service
     environment:
       SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthsys_notification
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: healthsys
       SPRING_RABBITMQ_PASSWORD: healthsys
+      JWT_SECRET: change-this-shared-secret-for-dev-only
     depends_on:
+      postgres:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
@@ -101,6 +143,11 @@ services:
       SERVER_PORT: 8080
       IDENTITY_SERVICE_URL: http://identity-service:8081
       PATIENT_SERVICE_URL: http://patient-service:8082
+      TRIAGE_SERVICE_URL: http://triage-service:8084
+      NOTIFICATION_SERVICE_URL: http://notification-service:8083
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: change-this-shared-secret-for-dev-only
     ports:
       - "8080:8080"
     depends_on:
@@ -108,6 +155,12 @@ services:
         condition: service_started
       patient-service:
         condition: service_started
+      triage-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
+      redis:
+        condition: service_healthy
 
   frontend:
     build:

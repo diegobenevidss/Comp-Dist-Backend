@@ -1,6 +1,16 @@
 spring:
   application:
     name: notification-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/healthsys_notification}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
     port: ${SPRING_RABBITMQ_PORT:5672}
@@ -15,6 +25,9 @@ management:
 
 server:
   port: ${SERVER_PORT:8083}
+
+jwt:
+  secret: ${JWT_SECRET:change-this-shared-secret-for-dev-only}
 
 app:
   messaging:

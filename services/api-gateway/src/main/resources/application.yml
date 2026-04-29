@@ -1,6 +1,10 @@
 spring:
   application:
     name: api-gateway
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
   cloud:
     gateway:
       server:
@@ -10,14 +14,57 @@ spring:
               uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/auth/**
+
             - id: identity-users
               uri: ${IDENTITY_SERVICE_URL:http://localhost:8081}
               predicates:
                 - Path=/api/users/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: identityCB
+                    fallbackUri: forward:/fallback
+
             - id: patient-service
               uri: ${PATIENT_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/api/patients/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: patientCB
+                    fallbackUri: forward:/fallback
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 20
+                    redis-rate-limiter.burstCapacity: 40
+                    redis-rate-limiter.requestedTokens: 1
+
+            - id: triage-service
+              uri: ${TRIAGE_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/triages/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: triageCB
+                    fallbackUri: forward:/fallback
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 20
+                    redis-rate-limiter.burstCapacity: 40
+                    redis-rate-limiter.requestedTokens: 1
+
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/notifications/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: notificationCB
+                    fallbackUri: forward:/fallback
+
           globalcors:
             cors-configurations:
               "[/**]":
@@ -36,6 +83,30 @@ spring:
                 allowedHeaders: "*"
                 allowCredentials: true
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      identityCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+      patientCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+      triageCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+      notificationCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+
 management:
   endpoints:
     web:
@@ -44,3 +115,6 @@ management:
 
 server:
   port: ${SERVER_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:change-this-shared-secret-for-dev-only}

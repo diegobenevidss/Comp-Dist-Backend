@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: triage-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/healthsys_triage}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:healthsys}
+    password: ${SPRING_RABBITMQ_PASSWORD:healthsys}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  port: ${SERVER_PORT:8084}
+
+jwt:
+  secret: ${JWT_SECRET:change-this-shared-secret-for-dev-only}
+
+app:
+  messaging:
+    exchange: ${APP_MESSAGING_EXCHANGE:healthsys.events}
+    auth-logout-queue: ${APP_MESSAGING_AUTH_LOGOUT_QUEUE:healthsys.triage.auth-token-revoked}
+    auth-logout-routing-key: ${APP_MESSAGING_AUTH_LOGOUT_ROUTING_KEY:healthsys.auth.token-revoked}
