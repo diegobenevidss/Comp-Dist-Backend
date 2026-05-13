@@ -5,3 +5,5 @@
 .DS_Store
 *.log
 .env
+scripts/load-tests/results/*.json
+scripts/load-tests/results/*.csv

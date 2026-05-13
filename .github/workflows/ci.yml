@@ -59,3 +59,5 @@ jobs:
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
           SPRING_RABBITMQ_HOST: localhost
+          SPRING_RABBITMQ_USERNAME: healthsys
+          SPRING_RABBITMQ_PASSWORD: healthsys

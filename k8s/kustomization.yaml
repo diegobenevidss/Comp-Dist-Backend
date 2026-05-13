@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: healthsys
+
+resources:
+  - 00-namespace.yaml
+  - 01-secrets.yaml
+  - 02-postgres.yaml
+  - 03-rabbitmq.yaml
+  - 04-identity-service.yaml
+  - 05-patient-service.yaml
+  - 06-notification-service.yaml
+  - 07-api-gateway.yaml
+  - 08-monitoring.yaml
+  - 09-ingress.yaml

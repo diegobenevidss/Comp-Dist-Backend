@@ -46,7 +46,7 @@ public class Patient {
     @Column(nullable = false)
     private boolean active;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)

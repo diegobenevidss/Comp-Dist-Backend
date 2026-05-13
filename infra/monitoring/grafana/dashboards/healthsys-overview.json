@@ -1,0 +1,205 @@
+{
+  "annotations": { "list": [] },
+  "description": "HealthSys Microservices - Visão Geral",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "red", "index": 0, "text": "DOWN" }, "1": { "color": "green", "index": 1, "text": "UP" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "API Gateway",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus" }, "expr": "up{job=\"api-gateway\"}", "instant": true, "legendFormat": "api-gateway", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "red", "index": 0, "text": "DOWN" }, "1": { "color": "green", "index": 1, "text": "UP" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "Identity Service",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus" }, "expr": "up{job=\"identity-service\"}", "instant": true, "legendFormat": "identity-service", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "red", "index": 0, "text": "DOWN" }, "1": { "color": "green", "index": 1, "text": "UP" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "Patient Service",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus" }, "expr": "up{job=\"patient-service\"}", "instant": true, "legendFormat": "patient-service", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "red", "index": 0, "text": "DOWN" }, "1": { "color": "green", "index": 1, "text": "UP" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "Notification Service",
+      "type": "stat",
+      "targets": [{ "datasource": { "type": "prometheus" }, "expr": "up{job=\"notification-service\"}", "instant": true, "legendFormat": "notification-service", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "req/s", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineWidth": 2, "showPoints": "never", "spanNulls": true },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "id": 5,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "Taxa de Requisições HTTP",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{application=\"api-gateway\"}[1m])) by (application)", "legendFormat": "api-gateway", "refId": "A" },
+        { "datasource": { "type": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{application=\"identity-service\"}[1m])) by (application)", "legendFormat": "identity-service", "refId": "B" },
+        { "datasource": { "type": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{application=\"patient-service\"}[1m])) by (application)", "legendFormat": "patient-service", "refId": "C" },
+        { "datasource": { "type": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{application=\"notification-service\"}[1m])) by (application)", "legendFormat": "notification-service", "refId": "D" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "req/s", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineWidth": 2, "showPoints": "never", "spanNulls": true },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "id": 6,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "Taxa de Erros HTTP (5xx)",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus" }, "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[1m])) by (application)", "legendFormat": "{{application}}", "refId": "A" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "latência (s)", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineWidth": 2, "showPoints": "never", "spanNulls": true },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "id": 7,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "Latência p95 (HTTP)",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus" }, "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"api-gateway\"}[1m])) by (le, application))", "legendFormat": "api-gateway p95", "refId": "A" },
+        { "datasource": { "type": "prometheus" }, "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"identity-service\"}[1m])) by (le, application))", "legendFormat": "identity-service p95", "refId": "B" },
+        { "datasource": { "type": "prometheus" }, "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"patient-service\"}[1m])) by (le, application))", "legendFormat": "patient-service p95", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineWidth": 2, "showPoints": "never", "spanNulls": true },
+          "unit": "bytes",
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "id": 8,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "Uso de Memória JVM (Heap)",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus" }, "expr": "jvm_memory_used_bytes{area=\"heap\", application=\"identity-service\"}", "legendFormat": "identity-service", "refId": "A" },
+        { "datasource": { "type": "prometheus" }, "expr": "jvm_memory_used_bytes{area=\"heap\", application=\"patient-service\"}", "legendFormat": "patient-service", "refId": "B" },
+        { "datasource": { "type": "prometheus" }, "expr": "jvm_memory_used_bytes{area=\"heap\", application=\"notification-service\"}", "legendFormat": "notification-service", "refId": "C" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "default" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "%", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineWidth": 2, "showPoints": "never", "spanNulls": true },
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 20 },
+      "id": 9,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "Uso de CPU por Serviço",
+      "type": "timeseries",
+      "targets": [
+        { "datasource": { "type": "prometheus" }, "expr": "process_cpu_usage{application=\"api-gateway\"}", "legendFormat": "api-gateway", "refId": "A" },
+        { "datasource": { "type": "prometheus" }, "expr": "process_cpu_usage{application=\"identity-service\"}", "legendFormat": "identity-service", "refId": "B" },
+        { "datasource": { "type": "prometheus" }, "expr": "process_cpu_usage{application=\"patient-service\"}", "legendFormat": "patient-service", "refId": "C" },
+        { "datasource": { "type": "prometheus" }, "expr": "process_cpu_usage{application=\"notification-service\"}", "legendFormat": "notification-service", "refId": "D" }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["healthsys", "spring-boot", "microservices"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "HealthSys - Visão Geral",
+  "uid": "healthsys-overview",
+  "version": 1
+}

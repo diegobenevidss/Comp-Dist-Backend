@@ -90,7 +90,6 @@ class PatientServiceUnitTest {
         );
 
         when(patientRepository.findById(patientId)).thenReturn(Optional.of(patient));
-        when(patientRepository.save(patient)).thenReturn(patient);
 
         PatientResponse response = patientService.updatePatient(patientId, request);
 
