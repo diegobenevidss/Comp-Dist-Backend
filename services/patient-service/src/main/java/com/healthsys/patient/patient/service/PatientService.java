@@ -68,9 +68,8 @@ public class PatientService {
         patient.setPhone(request.phone().trim());
         patient.setActive(request.active());
 
-        Patient updatedPatient = patientRepository.save(patient);
-        patientEventPublisher.publishPatientUpdated(updatedPatient);
-        return toResponse(updatedPatient);
+        patientEventPublisher.publishPatientUpdated(patient);
+        return toResponse(patient);
     }
 
     private PatientResponse toResponse(Patient patient) {
