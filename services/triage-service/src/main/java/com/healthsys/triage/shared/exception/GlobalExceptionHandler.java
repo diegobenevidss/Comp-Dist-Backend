@@ -1,5 +1,6 @@
 package com.healthsys.triage.shared.exception;
 
+import com.healthsys.triage.ai.AiServiceException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,6 +18,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(ResourceNotFoundException ex) {
         return new ApiError(404, ex.getMessage(), Map.of(), Instant.now());
+    }
+
+    @ExceptionHandler(AiServiceException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ApiError handleAiService(AiServiceException ex) {
+        return new ApiError(503, ex.getMessage(), Map.of(), Instant.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

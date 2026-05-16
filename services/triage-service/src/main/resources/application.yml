@@ -34,3 +34,6 @@ app:
     exchange: ${APP_MESSAGING_EXCHANGE:healthsys.events}
     auth-logout-queue: ${APP_MESSAGING_AUTH_LOGOUT_QUEUE:healthsys.triage.auth-token-revoked}
     auth-logout-routing-key: ${APP_MESSAGING_AUTH_LOGOUT_ROUTING_KEY:healthsys.auth.token-revoked}
+
+anthropic:
+  api-key: ${ANTHROPIC_API_KEY:}

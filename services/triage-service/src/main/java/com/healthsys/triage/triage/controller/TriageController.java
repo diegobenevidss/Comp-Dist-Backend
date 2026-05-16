@@ -1,6 +1,9 @@
 package com.healthsys.triage.triage.controller;
 
+import com.healthsys.triage.ai.AiTriageService;
 import com.healthsys.triage.triage.dto.CreateTriageRequest;
+import com.healthsys.triage.triage.dto.SuggestPriorityRequest;
+import com.healthsys.triage.triage.dto.SuggestPriorityResponse;
 import com.healthsys.triage.triage.dto.TriageResponse;
 import com.healthsys.triage.triage.dto.UpdateTriageStatusRequest;
 import com.healthsys.triage.triage.service.TriageService;
@@ -23,9 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class TriageController {
 
     private final TriageService triageService;
+    private final AiTriageService aiTriageService;
 
-    public TriageController(TriageService triageService) {
+    public TriageController(TriageService triageService, AiTriageService aiTriageService) {
         this.triageService = triageService;
+        this.aiTriageService = aiTriageService;
     }
 
     @PostMapping
@@ -33,6 +38,12 @@ public class TriageController {
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST', 'HEALTH_PROFESSIONAL')")
     public TriageResponse createTriage(@Valid @RequestBody CreateTriageRequest request) {
         return triageService.createTriage(request);
+    }
+
+    @PostMapping("/suggest-priority")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST', 'HEALTH_PROFESSIONAL')")
+    public SuggestPriorityResponse suggestPriority(@Valid @RequestBody SuggestPriorityRequest request) {
+        return aiTriageService.suggestPriority(request);
     }
 
     @GetMapping
