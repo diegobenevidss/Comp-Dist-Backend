@@ -92,7 +92,7 @@ jobs:
           kubectl delete secret ghcr-pull-secret -n healthsys --ignore-not-found
           kubectl create secret docker-registry ghcr-pull-secret \
             --docker-server=ghcr.io \
-            --docker-username=${{ github.actor }} \
+            --docker-username=${{ github.repository_owner }} \
             --docker-password=${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }} \
             -n healthsys
           kubectl patch serviceaccount default -n healthsys \
