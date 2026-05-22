@@ -19,6 +19,8 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
         prometheus.io/port: "8080"
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
       containers:
         - name: api-gateway
           image: ghcr.io/sachow12/healthsys-api-gateway:latest

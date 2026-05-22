@@ -19,6 +19,8 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
         prometheus.io/port: "8082"
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
       containers:
         - name: patient-service
           image: ghcr.io/sachow12/healthsys-patient-service:latest
