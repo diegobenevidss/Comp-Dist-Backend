@@ -7,7 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
+  IMAGE_PREFIX: ghcr.io/diegobenevidss
+  GHCR_USERNAME: diegobenevidss
 
 jobs:
   build-and-push:
@@ -40,8 +41,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ env.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Extract metadata
         id: meta
@@ -92,8 +93,8 @@ jobs:
           kubectl delete secret ghcr-pull-secret -n healthsys --ignore-not-found
           kubectl create secret docker-registry ghcr-pull-secret \
             --docker-server=ghcr.io \
-            --docker-username=${{ github.repository_owner }} \
-            --docker-password=${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }} \
+            --docker-username=${{ env.GHCR_USERNAME }} \
+            --docker-password=${{ secrets.GHCR_PAT }} \
             -n healthsys
           kubectl patch serviceaccount default -n healthsys \
             -p '{"imagePullSecrets":[{"name":"ghcr-pull-secret"}]}'
