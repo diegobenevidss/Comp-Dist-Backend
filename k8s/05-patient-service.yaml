@@ -6,7 +6,7 @@ metadata:
   labels:
     app: patient-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: patient-service
@@ -67,7 +67,7 @@ spec:
           resources:
             requests:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "50m"
             limits:
               memory: "1Gi"
               cpu: "500m"
@@ -95,7 +95,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: patient-service
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 6
   metrics:
     - type: Resource

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: identity-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: identity-service
@@ -76,7 +76,7 @@ spec:
           resources:
             requests:
               memory: "512Mi"
-              cpu: "250m"
+              cpu: "50m"
             limits:
               memory: "1Gi"
               cpu: "500m"
