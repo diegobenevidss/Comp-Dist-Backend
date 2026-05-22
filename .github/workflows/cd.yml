@@ -65,8 +65,8 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service.name }}
 
-  deploy-k8s:
-    name: Deploy to Kubernetes (kind)
+  deploy-aks:
+    name: Deploy to Kubernetes (Azure AKS)
     runs-on: ubuntu-latest
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
@@ -75,18 +75,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create kind cluster
-        uses: helm/kind-action@v1
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          cluster_name: healthsys-ci
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: 'healthsys-rg'
+          cluster-name: 'healthsys-cluster'
 
       - name: Create namespace and GHCR pull secret
         run: |
           kubectl apply -f k8s/00-namespace.yaml
+          kubectl delete secret ghcr-pull-secret -n healthsys --ignore-not-found
           kubectl create secret docker-registry ghcr-pull-secret \
             --docker-server=ghcr.io \
             --docker-username=${{ github.actor }} \
-            --docker-password=${{ secrets.GITHUB_TOKEN }} \
+            --docker-password=${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }} \
             -n healthsys
           kubectl patch serviceaccount default -n healthsys \
             -p '{"imagePullSecrets":[{"name":"ghcr-pull-secret"}]}'
