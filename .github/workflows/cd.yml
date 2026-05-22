@@ -86,10 +86,17 @@ jobs:
           resource-group: 'healthsys-rg'
           cluster-name: 'healthsys-cluster'
 
-      - name: Create namespace
+      - name: Create namespace and GHCR pull secret
         run: |
           kubectl apply -f k8s/00-namespace.yaml
-          kubectl patch serviceaccount default -n healthsys -p '{"imagePullSecrets": []}'
+          kubectl delete secret ghcr-pull-secret -n healthsys --ignore-not-found
+          kubectl create secret docker-registry ghcr-pull-secret \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }} \
+            -n healthsys
+          kubectl patch serviceaccount default -n healthsys \
+            -p '{"imagePullSecrets":[{"name":"ghcr-pull-secret"}]}'
 
       - name: Apply manifests
         run: |
