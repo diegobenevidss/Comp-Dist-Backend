@@ -34,6 +34,8 @@ spec:
               value: http://identity-service:8081
             - name: PATIENT_SERVICE_URL
               value: http://patient-service:8082
+            - name: NOTIFICATION_SERVICE_URL
+              value: http://notification-service:8083
           readinessProbe:
             httpGet:
               path: /actuator/health
