@@ -19,11 +19,10 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
         prometheus.io/port: "8081"
     spec:
-      imagePullSecrets:
-        - name: ghcr-pull-secret
       containers:
         - name: identity-service
-          image: ghcr.io/sachow12/healthsys-identity-service:latest
+          image: ghcr.io/diegobenevidss/healthsys-identity-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
           env:

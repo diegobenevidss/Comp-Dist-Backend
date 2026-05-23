@@ -109,15 +109,6 @@ jobs:
           kubectl apply -f k8s/06-notification-service.yaml
           kubectl apply -f k8s/07-api-gateway.yaml
 
-      - name: Update image tags to SHA
-        run: |
-          SHA_TAG="sha-$(echo ${{ github.sha }} | head -c 7)"
-          for svc in api-gateway identity-service patient-service notification-service; do
-            kubectl set image deployment/$svc \
-              $svc=${{ env.IMAGE_PREFIX }}/healthsys-$svc:$SHA_TAG \
-              -n healthsys
-          done
-
       - name: Wait for rollout
         run: |
           for svc in api-gateway identity-service patient-service notification-service; do
