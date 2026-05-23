@@ -7,6 +7,7 @@ data:
   init.sql: |
     CREATE DATABASE healthsys_identity;
     CREATE DATABASE healthsys_patient;
+    CREATE DATABASE healthsys_notification;
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

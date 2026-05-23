@@ -28,6 +28,8 @@ spec:
           env:
             - name: SERVER_PORT
               value: "8080"
+            - name: SPRING_DATA_REDIS_HOST
+              value: "redis"
             - name: IDENTITY_SERVICE_URL
               value: http://identity-service:8081
             - name: PATIENT_SERVICE_URL

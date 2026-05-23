@@ -28,6 +28,15 @@ spec:
           env:
             - name: SERVER_PORT
               value: "8083"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/healthsys_notification
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: healthsys-secrets
+                  key: postgres-password
             - name: SPRING_RABBITMQ_HOST
               value: rabbitmq
             - name: SPRING_RABBITMQ_PORT

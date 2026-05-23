@@ -28,6 +28,8 @@ spec:
           env:
             - name: SERVER_PORT
               value: "8082"
+            - name: SPRING_DATA_REDIS_HOST
+              value: "redis"
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://postgres:5432/healthsys_patient
             - name: SPRING_DATASOURCE_USERNAME
