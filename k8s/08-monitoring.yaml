@@ -40,6 +40,8 @@ metadata:
     app: prometheus
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: prometheus
@@ -72,7 +74,7 @@ spec:
           resources:
             requests:
               memory: "128Mi"
-              cpu: "50m"
+              cpu: "5m"
             limits:
               memory: "512Mi"
               cpu: "250m"
@@ -148,6 +150,8 @@ metadata:
     app: grafana
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: grafana
@@ -173,8 +177,8 @@ spec:
               mountPath: /etc/grafana/provisioning/datasources
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "50m"
+              memory: "64Mi"
+              cpu: "5m"
             limits:
               memory: "512Mi"
               cpu: "250m"
@@ -194,4 +198,4 @@ spec:
   ports:
     - port: 3000
       targetPort: 3000
-  type: LoadBalancer
+  type: ClusterIP
