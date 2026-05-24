@@ -182,5 +182,14 @@ jobs:
       - name: Wait for rollout
         run: |
           for svc in api-gateway identity-service patient-service triage-service notification-service frontend prometheus grafana; do
-            kubectl rollout status deployment/$svc -n healthsys --timeout=300s
+            if ! kubectl rollout status deployment/$svc -n healthsys --timeout=300s; then
+              echo "::group::Kubernetes diagnostics for $svc"
+              kubectl get pods -n healthsys -o wide
+              kubectl describe deployment/$svc -n healthsys
+              kubectl describe pods -n healthsys -l app=$svc
+              kubectl logs -n healthsys deployment/$svc --all-containers --tail=120 || true
+              kubectl get events -n healthsys --sort-by=.lastTimestamp | tail -80
+              echo "::endgroup::"
+              exit 1
+            fi
           done
