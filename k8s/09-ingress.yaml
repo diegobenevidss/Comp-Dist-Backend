@@ -4,7 +4,6 @@ metadata:
   name: healthsys-ingress
   namespace: healthsys
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
 spec:
@@ -13,11 +12,18 @@ spec:
     - host: healthsys.local
       http:
         paths:
-          - path: /
+          - path: /api
             pathType: Prefix
             backend:
               service:
                 name: api-gateway
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
                 port:
                   number: 80
     - host: grafana.healthsys.local

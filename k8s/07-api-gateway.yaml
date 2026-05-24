@@ -30,12 +30,21 @@ spec:
               value: "8080"
             - name: SPRING_DATA_REDIS_HOST
               value: "redis"
+            - name: SPRING_DATA_REDIS_PORT
+              value: "6379"
             - name: IDENTITY_SERVICE_URL
               value: http://identity-service:8081
             - name: PATIENT_SERVICE_URL
               value: http://patient-service:8082
+            - name: TRIAGE_SERVICE_URL
+              value: http://triage-service:8084
             - name: NOTIFICATION_SERVICE_URL
               value: http://notification-service:8083
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: healthsys-secrets
+                  key: jwt-secret
           readinessProbe:
             httpGet:
               path: /actuator/health

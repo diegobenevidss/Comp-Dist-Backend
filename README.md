@@ -140,6 +140,28 @@ powershell -ExecutionPolicy Bypass -File .\scripts\smoke-weeks-1-4.ps1
 
 Observacao: apos `docker compose up -d --build`, aguarde os servicos Spring Boot terminarem a inicializacao antes de executar chamadas manuais. O container pode aparecer como `Up` antes de o endpoint estar pronto.
 
+## Deploy em Nuvem
+
+O workflow `.github/workflows/cd.yml` executa o deploy em Azure AKS a cada push na `main`.
+
+O CD:
+
+- builda e publica imagens multi-arch no GitHub Container Registry
+- aplica os manifests Kubernetes no namespace `healthsys`
+- inicializa/verifica os bancos PostgreSQL de forma idempotente
+- faz rollout de `identity-service`, `patient-service`, `triage-service`, `notification-service`, `api-gateway`, `frontend`, `prometheus` e `grafana`
+
+Recursos aplicados:
+
+- PostgreSQL
+- RabbitMQ
+- Redis
+- microsservicos Spring Boot
+- frontend React servido por Nginx
+- Prometheus
+- Grafana
+- Ingress para frontend/API e dashboards
+
 ## Fora de Escopo Nesta Entrega
 
 - prontuario eletronico completo

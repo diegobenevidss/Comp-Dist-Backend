@@ -10,7 +10,10 @@ resources:
   - 03-rabbitmq.yaml
   - 04-identity-service.yaml
   - 05-patient-service.yaml
+  - 11-triage-service.yaml
   - 06-notification-service.yaml
   - 07-api-gateway.yaml
+  - 10-redis.yaml
+  - 12-frontend.yaml
   - 08-monitoring.yaml
   - 09-ingress.yaml
