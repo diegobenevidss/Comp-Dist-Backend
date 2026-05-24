@@ -22,14 +22,10 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ResultsDir = Join-Path $ScriptDir "results"
+$RepoRoot = Resolve-Path (Join-Path $ScriptDir "..\..")
 
 if (-not (Test-Path $ResultsDir)) {
     New-Item -ItemType Directory -Path $ResultsDir | Out-Null
-}
-
-if (-not (Get-Command k6 -ErrorAction SilentlyContinue)) {
-    Write-Error "k6 nao encontrado. Instale em: https://grafana.com/docs/k6/latest/set-up/install-k6/"
-    exit 1
 }
 
 Write-Host ""
@@ -42,6 +38,7 @@ Write-Host ""
 $env:BASE_URL = $BaseUrl
 $env:ADMIN_EMAIL = $AdminEmail
 $env:ADMIN_PASSWORD = $AdminPassword
+$env:SCENARIO = $Scenario
 
 $TestFile = Join-Path $ScriptDir "load-test.js"
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -51,14 +48,38 @@ $K6Args = @(
     "--out", "json=$ResultsDir/raw-$Timestamp.json"
 )
 
-if ($Scenario -ne "all") {
-    $K6Args += @("--scenario", $Scenario)
-}
-
 $K6Args += $TestFile
 
-Write-Host "Iniciando k6..." -ForegroundColor Yellow
-k6 @K6Args
+if (Get-Command k6 -ErrorAction SilentlyContinue) {
+    Write-Host "Iniciando k6 local..." -ForegroundColor Yellow
+    k6 @K6Args
+} elseif (Get-Command docker -ErrorAction SilentlyContinue) {
+    Write-Host "k6 local nao encontrado. Iniciando via Docker..." -ForegroundColor Yellow
+
+    $DockerBaseUrl = $BaseUrl `
+        -replace '^http://localhost:', 'http://host.docker.internal:' `
+        -replace '^http://127\.0\.0\.1:', 'http://host.docker.internal:'
+
+    $DockerArgs = @(
+        "run",
+        "--rm",
+        "-v", "$($RepoRoot.Path):/workspace",
+        "-w", "/workspace",
+        "-e", "BASE_URL=$DockerBaseUrl",
+        "-e", "ADMIN_EMAIL=$AdminEmail",
+        "-e", "ADMIN_PASSWORD=$AdminPassword",
+        "-e", "SCENARIO=$Scenario",
+        "grafana/k6:0.50.0",
+        "run",
+        "--out", "json=/workspace/scripts/load-tests/results/raw-$Timestamp.json"
+    )
+
+    $DockerArgs += "/workspace/scripts/load-tests/load-test.js"
+    docker @DockerArgs
+} else {
+    Write-Error "k6 e docker nao encontrados. Instale k6 ou Docker para executar os testes de carga."
+    exit 1
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""

@@ -5,21 +5,21 @@ import { Rate, Trend } from 'k6/metrics';
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080';
 const ADMIN_EMAIL = __ENV.ADMIN_EMAIL || 'admin@healthsys.local';
 const ADMIN_PASSWORD = __ENV.ADMIN_PASSWORD || 'Admin@123';
+const SCENARIO = __ENV.SCENARIO || 'all';
 
 const errorRate = new Rate('errors');
 const loginDuration = new Trend('login_duration', true);
 const patientCreateDuration = new Trend('patient_create_duration', true);
 const patientListDuration = new Trend('patient_list_duration', true);
 
-export const options = {
-  scenarios: {
-    smoke: {
+const allScenarios = {
+  smoke: {
       executor: 'constant-vus',
       vus: 2,
       duration: '30s',
       tags: { scenario: 'smoke' },
-    },
-    load: {
+  },
+  load: {
       executor: 'ramping-vus',
       startVUs: 0,
       stages: [
@@ -29,8 +29,8 @@ export const options = {
       ],
       startTime: '35s',
       tags: { scenario: 'load' },
-    },
-    spike: {
+  },
+  spike: {
       executor: 'ramping-vus',
       startVUs: 0,
       stages: [
@@ -40,8 +40,23 @@ export const options = {
       ],
       startTime: '6m',
       tags: { scenario: 'spike' },
-    },
   },
+};
+
+function resolveScenarios() {
+  if (SCENARIO === 'all') {
+    return allScenarios;
+  }
+
+  const selected = Object.assign({}, allScenarios[SCENARIO]);
+  delete selected.startTime;
+  const scenarios = {};
+  scenarios[SCENARIO] = selected;
+  return scenarios;
+}
+
+export const options = {
+  scenarios: resolveScenarios(),
   thresholds: {
     http_req_duration: ['p(95)<2000', 'p(99)<5000'],
     http_req_failed: ['rate<0.05'],
@@ -65,7 +80,7 @@ function login() {
     'login returns token': (r) => {
       try {
         return JSON.parse(r.body).token !== undefined;
-      } catch {
+      } catch (e) {
         return false;
       }
     },
@@ -92,13 +107,12 @@ function listPatients(token) {
 }
 
 function createPatient(token) {
-  const cpf = `${Math.floor(Math.random() * 90000000000) + 10000000000}`;
+  const suffix = `${Date.now()}${Math.floor(Math.random() * 10000)}`.slice(-8);
   const payload = JSON.stringify({
-    name: `Paciente Teste ${Math.floor(Math.random() * 10000)}`,
-    cpf: cpf,
-    dateOfBirth: '1990-01-01',
-    email: `paciente${cpf}@test.com`,
-    phone: '11999999999',
+    name: `Paciente Carga ${suffix}`,
+    birthDate: '1990-01-01',
+    sex: 'OTHER',
+    phone: `119${suffix}`,
   });
   const params = {
     headers: {
@@ -157,21 +171,27 @@ export function handleSummary(data) {
 
 function summaryReport(data) {
   const metrics = data.metrics;
+  const metricValue = (name, value, fallback) => {
+    if (!metrics[name] || !metrics[name].values || metrics[name].values[value] === undefined) {
+      return fallback;
+    }
+    return metrics[name].values[value];
+  };
   const lines = [
     '',
     '=== HealthSys Load Test Summary ===',
     '',
-    `Total requests:    ${metrics.http_reqs?.values?.count ?? 'N/A'}`,
-    `Failed requests:   ${((metrics.http_req_failed?.values?.rate ?? 0) * 100).toFixed(2)}%`,
-    `Error rate:        ${((metrics.errors?.values?.rate ?? 0) * 100).toFixed(2)}%`,
+    `Total requests:    ${metricValue('http_reqs', 'count', 'N/A')}`,
+    `Failed requests:   ${(metricValue('http_req_failed', 'rate', 0) * 100).toFixed(2)}%`,
+    `Error rate:        ${(metricValue('errors', 'rate', 0) * 100).toFixed(2)}%`,
     '',
-    `HTTP p50:          ${(metrics.http_req_duration?.values?.['p(50)'] ?? 0).toFixed(0)}ms`,
-    `HTTP p95:          ${(metrics.http_req_duration?.values?.['p(95)'] ?? 0).toFixed(0)}ms`,
-    `HTTP p99:          ${(metrics.http_req_duration?.values?.['p(99)'] ?? 0).toFixed(0)}ms`,
+    `HTTP p50:          ${metricValue('http_req_duration', 'p(50)', 0).toFixed(0)}ms`,
+    `HTTP p95:          ${metricValue('http_req_duration', 'p(95)', 0).toFixed(0)}ms`,
+    `HTTP p99:          ${metricValue('http_req_duration', 'p(99)', 0).toFixed(0)}ms`,
     '',
-    `Login p95:         ${(metrics.login_duration?.values?.['p(95)'] ?? 0).toFixed(0)}ms`,
-    `Patient list p95:  ${(metrics.patient_list_duration?.values?.['p(95)'] ?? 0).toFixed(0)}ms`,
-    `Patient create p95:${(metrics.patient_create_duration?.values?.['p(95)'] ?? 0).toFixed(0)}ms`,
+    `Login p95:         ${metricValue('login_duration', 'p(95)', 0).toFixed(0)}ms`,
+    `Patient list p95:  ${metricValue('patient_list_duration', 'p(95)', 0).toFixed(0)}ms`,
+    `Patient create p95:${metricValue('patient_create_duration', 'p(95)', 0).toFixed(0)}ms`,
     '',
   ];
   return lines.join('\n');
