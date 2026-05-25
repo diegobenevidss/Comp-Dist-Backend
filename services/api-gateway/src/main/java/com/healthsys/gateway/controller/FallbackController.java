@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 @RestController
 public class FallbackController {
 
+    //abiblkubke
     @RequestMapping("/fallback")
     public Mono<ResponseEntity<Map<String, String>>> fallback() {
         return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
