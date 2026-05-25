@@ -178,6 +178,7 @@ jobs:
           kubectl apply -f k8s/12-frontend.yaml
           kubectl apply -f k8s/08-monitoring.yaml
           kubectl apply -f k8s/09-ingress.yaml
+          kubectl rollout restart deployment/api-gateway deployment/identity-service deployment/patient-service deployment/triage-service deployment/notification-service deployment/frontend -n healthsys
 
       - name: Wait for rollout
         run: |
@@ -193,3 +194,8 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Show cloud endpoints
+        run: |
+          kubectl get svc -n healthsys -o wide
+          kubectl get ingress -n healthsys -o wide
