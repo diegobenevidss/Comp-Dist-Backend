@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: healthsys.local
+    - host: api.20.206.214.132.nip.io
       http:
         paths:
           - path: /api
@@ -26,7 +26,7 @@ spec:
                 name: frontend
                 port:
                   number: 80
-    - host: grafana.healthsys.local
+    - host: grafana.20.206.214.132.nip.io
       http:
         paths:
           - path: /
@@ -36,7 +36,7 @@ spec:
                 name: grafana
                 port:
                   number: 3000
-    - host: prometheus.healthsys.local
+    - host: prometheus.20.206.214.132.nip.io
       http:
         paths:
           - path: /
