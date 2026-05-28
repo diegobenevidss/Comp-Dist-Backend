@@ -29,7 +29,7 @@ spec:
             - name: SERVER_PORT
               value: "8081"
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/healthsys_identity
+              value: jdbc:postgresql://postgres.healthsys.svc.cluster.local:5432/healthsys_identity
             - name: SPRING_DATASOURCE_USERNAME
               value: postgres
             - name: SPRING_DATASOURCE_PASSWORD
@@ -38,7 +38,7 @@ spec:
                   name: healthsys-secrets
                   key: postgres-password
             - name: SPRING_RABBITMQ_HOST
-              value: rabbitmq
+              value: rabbitmq.healthsys.svc.cluster.local
             - name: SPRING_RABBITMQ_PORT
               value: "5672"
             - name: SPRING_RABBITMQ_USERNAME
