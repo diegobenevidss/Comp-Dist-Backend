@@ -188,7 +188,17 @@ jobs:
               kubectl get pods -n healthsys -o wide
               kubectl describe deployment/$svc -n healthsys
               kubectl describe pods -n healthsys -l app=$svc
-              kubectl logs -n healthsys deployment/$svc --all-containers --tail=120 || true
+              
+              echo "--- LOGS DO POD ANTIGO (IGNORAR SE O NOVO ESTIVER QUEBRANDO) ---"
+              kubectl logs -n healthsys deployment/$svc --all-containers --tail=50 || true
+              
+              echo "--- LOGS DO POD NOVO (O QUE DEU ERRO AGORA) ---"
+              NEW_POD=$(kubectl get pods -n healthsys -l app=$svc --sort-by=.metadata.creationTimestamp -o jsonpath="{.items[-1].metadata.name}")
+              echo "Buscando logs de: $NEW_POD"
+              kubectl logs -n healthsys $NEW_POD --all-containers --tail=200 || true
+              kubectl logs -n healthsys $NEW_POD --all-containers --previous --tail=200 || true
+              
+              echo "--- EVENTOS DO CLUSTER ---"
               kubectl get events -n healthsys --sort-by=.lastTimestamp | tail -80
               echo "::endgroup::"
               exit 1
