@@ -49,6 +49,7 @@ spec:
               command: ["rabbitmq-diagnostics", "check_port_connectivity"]
             initialDelaySeconds: 180
             periodSeconds: 10
+            timeoutSeconds: 15
           resources:
             requests:
               memory: "256Mi"

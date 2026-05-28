@@ -61,12 +61,14 @@ spec:
               port: 8083
             initialDelaySeconds: 180
             periodSeconds: 10
+            timeoutSeconds: 15
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8083
             initialDelaySeconds: 180
             periodSeconds: 30
+            timeoutSeconds: 15
           resources:
             requests:
               memory: "256Mi"
