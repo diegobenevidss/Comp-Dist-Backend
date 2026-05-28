@@ -22,7 +22,7 @@ spec:
       initContainers:
         - name: wait-for-redis
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z redis 6379; do echo "Aguardando o Redis iniciar..."; sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z redis.healthsys.svc.cluster.local 6379; do echo "Aguardando o Redis iniciar..."; sleep 2; done;']
       containers:
         - name: api-gateway
           image: ghcr.io/diegobenevidss/healthsys-api-gateway:latest
@@ -33,17 +33,17 @@ spec:
             - name: SERVER_PORT
               value: "8080"
             - name: SPRING_DATA_REDIS_HOST
-              value: "redis"
+              value: "redis.healthsys.svc.cluster.local"
             - name: SPRING_DATA_REDIS_PORT
               value: "6379"
             - name: IDENTITY_SERVICE_URL
-              value: http://identity-service:8081
+              value: http://identity-service.healthsys.svc.cluster.local:8081
             - name: PATIENT_SERVICE_URL
-              value: http://patient-service:8082
+              value: http://patient-service.healthsys.svc.cluster.local:8082
             - name: TRIAGE_SERVICE_URL
-              value: http://triage-service:8084
+              value: http://triage-service.healthsys.svc.cluster.local:8084
             - name: NOTIFICATION_SERVICE_URL
-              value: http://notification-service:8083
+              value: http://notification-service.healthsys.svc.cluster.local:8083
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
